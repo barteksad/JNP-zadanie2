@@ -2,7 +2,6 @@
 #include <string>
 
 
-int jnp::add(int x, int y) {
-    std::string s = "123";
-    return 1;
+unsigned long jnp1::maptel_create(void) {
+    return 0;
 }
