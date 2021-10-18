@@ -1,0 +1,4 @@
+.vscode
+*.o
+nic.c
+a
