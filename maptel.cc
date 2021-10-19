@@ -19,6 +19,8 @@ using std::cerr;
 using std::endl;
 using std::string;
 
+namespace jnp1 {
+
 using maptel_t = unordered_map<string, string>;
 using maptel_id_t = unsigned long;
 
@@ -197,4 +199,6 @@ void maptel_transform(unsigned long id,
 	if (debug) {
 		cerr << "maptel: maptel_transform: " << src_number << " -> " << number_to_copy <<"\n";
 	}
+}
+
 }

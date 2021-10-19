@@ -1,10 +1,11 @@
 #pragma once
+#include "stddef.h"
 
 #ifdef __cplusplus
+	namespace jnp1 {
+
     extern "C" {
 #endif
-
-#include "stddef.h"
 
 const size_t TEL_NUM_MAX_LEN = 22;
 
@@ -32,5 +33,6 @@ extern void maptel_transform(unsigned long id,
 	size_t len);
 
 #ifdef __cplusplus
+	}
 }
 #endif
