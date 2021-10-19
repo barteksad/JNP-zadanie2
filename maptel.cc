@@ -5,6 +5,7 @@
 #include <iostream>
 #include <regex>
 #include <cstring>
+#include <set>
 
 #ifdef NDEBUG
 const bool debug = false;
@@ -18,6 +19,7 @@ using std::unordered_map;
 using std::cerr;
 using std::endl;
 using std::string;
+using std::set;
 
 namespace jnp1 {
 
@@ -173,15 +175,16 @@ void maptel_transform(unsigned long id,
 	maptel_t id_maptel = (*found_maptel).second;
 	maptel_t::iterator walk1 = id_maptel.find(src_number), walk2;
 	bool write_src_to_dst = walk1 == id_maptel.end();
+	set<string> seen_numbers;
 
 	if (!write_src_to_dst)
 		while(true) {
 			walk2 = id_maptel.find((*walk1).second);
-			
+
 			if (walk2 == id_maptel.end())
 				break;
 			else {
-				if ((*walk2).second == src_number) {
+				if (!seen_numbers.insert((*walk2).second).second) {
 					write_src_to_dst = true;
 					break;
 				}
@@ -192,8 +195,8 @@ void maptel_transform(unsigned long id,
 
 	string number_to_copy = write_src_to_dst ? src_number : (*walk1).second;
 
-	if (len < number_to_copy.length() + 1)
-		realloc(tel_dst, number_to_copy.length() + 1);
+	// if (len < number_to_copy.length() + 1)
+	// 	realloc(tel_dst, number_to_copy.length() + 1);
 		
 	strcpy(tel_dst, number_to_copy.c_str());
 
