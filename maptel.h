@@ -1,41 +1,36 @@
 #pragma once
 
 #ifdef __cplusplus
-    #include <cstddef>
-#else
-    #include <stddef.h> // size_t
-#endif
-
-
-#ifdef __cplusplus
     extern "C" {
-    namespace jnp1 {
 #endif
 
-    const size_t TEL_NUM_MAX_LEN = 22;
+#include "stddef.h"
 
-    // Tworzy słownik i zwraca liczbę naturalną będącą jego identyfikatorem.
-    unsigned long maptel_create(void);  
+const size_t TEL_NUM_MAX_LEN = 22;
 
-    // Usuwa słownik o identyfikatorze id.
-    void maptel_delete(unsigned long id); 
-
-    // Wstawia do słownika o identyfikatorze id informację o zmianie numeru
-    // tel_src na numer tel_dst. Nadpisuje ewentualną istniejącą informację.
-    void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst); 
-
-    // Jeśli w słowniku o identyfikatorze id jest informacja o zmianie numeru
-    // tel_src, to ją usuwa. W przeciwnym przypadku nic nie robi.
-    void maptel_erase(unsigned long id, char const *tel_src);
-
-    // Sprawdza, czy w słowniku o identyfikatorze id jest zapisana zmiana numeru
-    // tel_src. Podąża ciągiem kolejnych zmian. Zapisuje zmieniony numer w tel_dst.
-    // Jeśli nie ma zmiany numeru lub zmiany tworzą cykl, to zapisuje w tel_dst
-    // numer tel_src. Wartość len to rozmiar przydzielonej pamięci wskazywanej
-    // przez tel_dst.
-    void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len);
+// Tworzy słownik i zwraca jego identyfikator id.
+extern unsigned long maptel_create(void);
+// Usuwa słownik o identyfikatorze id.
+extern void maptel_delete(unsigned long id);
+// Wstawia do słownika o identyfikatorze id informację
+// o zmianie numeru z tel_src na tel_dst. Nadpisuje ewentualnie
+// istniejącą informację o zmianie numeru tel_src.
+extern void maptel_insert(unsigned long id,
+	char const *tel_src,
+	char const *tel_dst);
+// Usuwa ze słownika o identyfikatorze id informację o zmianie
+// numeru tel_src, o ile taka istnieje.
+extern void maptel_erase(unsigned long id, char const *tel_src);
+// Podąża ciągiem kolejnych zmian numerów przechowywanych
+// w słowniku o identyfikatorze id, począwszy od tel_src. Ostatni
+// numer znaleziony w tym ciągu zapisuje w tel_dst.
+// Jeśli nie ma zmiany numeru lub zmiany tworzą cykl, to w tel_dst
+// zapisywany jest numer tel_src.
+extern void maptel_transform(unsigned long id,
+	char const *tel_src,
+	char *tel_dst,
+	size_t len);
 
 #ifdef __cplusplus
-    }
 }
 #endif
