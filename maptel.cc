@@ -157,6 +157,7 @@ void maptel_transform(unsigned long id,
 
 	if (debug) {
 		cerr << "maptel: maptel_transform(" 
+			<< id << ", "
 			<< tel_src << ", " 
 			<< (void *) tel_dst << ", "
 			<< len << ")\n";
