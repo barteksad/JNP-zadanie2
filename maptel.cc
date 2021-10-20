@@ -69,7 +69,7 @@ void maptel_delete(unsigned long id) {
 		all_maptels.erase(id);
 		
 		if(debug) {
-			cerr << "maptel: maptel_delete: map " << id << " deleted";
+			cerr << "maptel: maptel_delete: map " << id << " deleted\n";
 		}
 	}
 	else {
