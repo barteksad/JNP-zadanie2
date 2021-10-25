@@ -156,7 +156,7 @@ namespace jnp1 {
 		}
 
 		string src_number(tel_src);
-		string dst_number(tel_dst);
+		//string dst_number(tel_dst);
 
 		unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = 
 			all_maptels.find(id);
