@@ -28,39 +28,28 @@ using maptel_id_t = unsigned long;
 
 namespace {
 
-	// unordered_map<maptel_id_t, maptel_t> _all_maptels_init() {
-	// 	unordered_map<maptel_id_t, maptel_t> _all_maptels;
-	// 	return _all_maptels;
-	// }
+	// unordered_map<maptel_id_t, maptel_t> all_maptels;
+	// unordered_map<maptel_id_t, bool> is_id_taken;
+	// maptel_id_t last_free_id;	
 
-	// unordered_map<maptel_id_t, bool> _is_id_taken_init() {
-	// 	unordered_map<maptel_id_t, bool> _is_id_taken;
-	// 	return _is_id_taken;
-	// }
-
-	// maptel_id_t _last_free_id_init() {
-	// 	maptel_id_t _last_free_id = 0;
-	// 	return _last_free_id;
-	// }
-
-	unordered_map<maptel_id_t, maptel_t> all_maptels;
-	unordered_map<maptel_id_t, bool> is_id_taken;
-	maptel_id_t last_free_id;
-
-	void _all_maptels_init() {
+	unordered_map<maptel_id_t, maptel_t> &_all_maptels_init() {
 		static unordered_map<maptel_id_t, maptel_t> _all_maptels;
-		all_maptels = _all_maptels;
+		return _all_maptels;
 	}
 
-	void _is_id_taken_init() {
+	unordered_map<maptel_id_t, bool> &_is_id_taken_init() {
 		static unordered_map<maptel_id_t, bool> _is_id_taken;
-		is_id_taken = _is_id_taken;
+		return _is_id_taken;
 	}
 
-	void _last_free_id_init() {
+	maptel_id_t &_last_free_id_init() {
 		static maptel_id_t _last_free_id;
-		last_free_id = _last_free_id;
+		return _last_free_id;
 	}
+
+	unordered_map<maptel_id_t, maptel_t> all_maptels = _all_maptels_init();
+	unordered_map<maptel_id_t, bool> is_id_taken = _is_id_taken_init();
+	maptel_id_t last_free_id =_last_free_id_init();
 	
 	bool is_tel_correct(char const *tel) {
 		if (tel == NULL)
@@ -80,10 +69,6 @@ namespace {
 
 // Tworzy słownik i zwraca jego identyfikator id.
 unsigned long maptel_create(void) {
-
-	_all_maptels_init();
-	_is_id_taken_init();
-	_last_free_id_init();
 	
 	if( debug) {
 		cerr << "maptel: maptel_create()\n";
@@ -117,7 +102,7 @@ void maptel_delete(unsigned long id) {
 	all_maptels.erase(id);
 	
 	if (debug) {
-		cerr << "maptel: maptel_delete: map " << id << " deleted";
+		cerr << "maptel: maptel_delete: map " << id << " deleted\n";
 	}
 	
 	// else {
@@ -239,6 +224,11 @@ void maptel_transform(unsigned long id,
 				break;
 			else {
 				if (!seen_numbers.insert((*walk2).second).second) {
+
+					if (debug) {
+						cerr << "maptel: maptel_transform: cycle detected\n";
+					}
+
 					write_src_to_dst = true;
 					break;
 				}
