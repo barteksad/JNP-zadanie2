@@ -20,36 +20,55 @@ using std::cerr;
 using std::endl;
 using std::string;
 using std::set;
+using std::swap;
 
 namespace jnp1 {
 
 using maptel_t = unordered_map<string, string>;
 using maptel_id_t = unsigned long;
+using maptel_libraries_t = unordered_map<maptel_id_t, maptel_t>;
+using maptel_bool_map = unordered_map<maptel_id_t, bool>;
 
 namespace {
 
-	// unordered_map<maptel_id_t, maptel_t> all_maptels;
-	// unordered_map<maptel_id_t, bool> is_id_taken;
+	// maptel_libraries_t all_maptels;
+	// maptel_bool_map is_id_taken;
 	// maptel_id_t last_free_id;	
 
-	unordered_map<maptel_id_t, maptel_t> &_all_maptels_init() {
-		static unordered_map<maptel_id_t, maptel_t> _all_maptels;
-		return _all_maptels;
+	maptel_libraries_t & all_maptels() {
+		// all_maptels = maptel_libraries_t();
+		static maptel_libraries_t all_maptels;
+		return all_maptels;
 	}
 
-	unordered_map<maptel_id_t, bool> &_is_id_taken_init() {
-		static unordered_map<maptel_id_t, bool> _is_id_taken;
-		return _is_id_taken;
+	unordered_map<maptel_id_t, bool> & is_id_taken() {
+		// is_id_taken = maptel_bool_map();
+		static maptel_bool_map is_id_taken;
+		return is_id_taken;
 	}
 
-	maptel_id_t &_last_free_id_init() {
-		static maptel_id_t _last_free_id;
-		return _last_free_id;
+	maptel_id_t & last_free_id() {
+		// last_free_id = maptel_id_t();
+		static maptel_id_t last_free_id;
+		return last_free_id;
 	}
 
-	unordered_map<maptel_id_t, maptel_t> all_maptels = _all_maptels_init();
-	unordered_map<maptel_id_t, bool> is_id_taken = _is_id_taken_init();
-	maptel_id_t last_free_id =_last_free_id_init();
+	/*
+	void init_all() {
+		static bool inicialized;
+		if(!inicialized) {
+			cerr << "Inicializing\n";
+			last_free_id_init();
+			is_id_taken_init();
+			all_maptels_init();
+			inicialized = true;
+		}
+	}
+	//*/
+
+	//unordered_map<maptel_id_t, maptel_t> all_maptels = _all_maptels_init();
+	//unordered_map<maptel_id_t, bool> is_id_taken = _is_id_taken_init();
+	//maptel_id_t last_free_id =_last_free_id_init();
 	
 	bool is_tel_correct(char const *tel) {
 		if (tel == NULL)
@@ -70,43 +89,47 @@ namespace {
 // Tworzy słownik i zwraca jego identyfikator id.
 unsigned long maptel_create(void) {
 	
-	if( debug) {
+	if (debug) {
 		cerr << "maptel: maptel_create()\n";
 	}
 
-	while(is_id_taken[last_free_id]) {
-		++last_free_id;
+	//init_all();
+
+	while (is_id_taken()[last_free_id()]) {
+		++last_free_id();
 	}
 	
-	is_id_taken[last_free_id] = true;
-	all_maptels[last_free_id] = maptel_t();
+	is_id_taken()[last_free_id()] = true;
+	all_maptels()[last_free_id()] = maptel_t();
 	
-	if(debug) {
-		cerr << "maptel: maptel_create: new map id = " << last_free_id << endl;
+	//cerr << "is_id_taken()[" << last_free_id() << "] == " << is_id_taken()[last_free_id()] << endl;
+
+	if (debug) {
+		cerr << "maptel: maptel_create: new map id = " << last_free_id() << endl;
 	}
 	
-	return last_free_id++;
+	return last_free_id()++;
 }
 
 // Usuwa słownik o identyfikatorze id.
 void maptel_delete(unsigned long id) {
 
 	if (debug) {
-		assert(is_id_taken[id]);
+		assert(is_id_taken()[id]);
 
 		cerr << "maptel: maptel_delete(" << id << ")\n";
 	}
 	
 
-	is_id_taken.erase(id);
-	all_maptels.erase(id);
+	is_id_taken().erase(id);
+	all_maptels().erase(id);
 	
 	if (debug) {
 		cerr << "maptel: maptel_delete: map " << id << " deleted\n";
 	}
 	
 	// else {
-	// 	is_id_taken.erase(id);
+	// 	is_id_taken().erase(id);
 	// 	if(debug) {
 	// 		cerr << "maptel: maptel_delete: nothing to delete\n";
 	// 	}
@@ -121,7 +144,7 @@ void maptel_insert(unsigned long id,
 	char const *tel_dst) {
 
 	if (debug) {
-		assert(is_id_taken[id]);
+		assert(is_id_taken()[id]);
 		assert(is_tel_correct(tel_src));
 		assert(is_tel_correct(tel_dst));
 
@@ -130,7 +153,7 @@ void maptel_insert(unsigned long id,
 	}
 	
 
-	// is_id_taken.erase(id);
+	// is_id_taken().erase(id);
 	
 	// if(debug) {
 	// 	cerr << "maptel: map id = " << id << " does not exist\n";
@@ -149,7 +172,7 @@ void maptel_insert(unsigned long id,
 	// 	return;
 	// }
 	
-	all_maptels[id][string(tel_src)] = string(tel_dst);
+	all_maptels()[id][string(tel_src)] = string(tel_dst);
 	
 	if(debug) {
 		cerr << "maptel: maptel_insert: inserted\n";
@@ -161,15 +184,15 @@ void maptel_insert(unsigned long id,
 void maptel_erase(unsigned long id, char const *tel_src) {
 
 	if (debug) {
-		assert(is_id_taken[id]);
+		assert(is_id_taken()[id]);
 		assert(is_tel_correct(tel_src));
 		
 		cerr << "maptel: maptel_erase(" << id << ", " << tel_src << ")\n";
 	}
 
-	unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = all_maptels.find(id);
+	unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = all_maptels().find(id);
 
-	if (found_maptel != all_maptels.end()) {
+	if (found_maptel != all_maptels().end()) {
 		string src_number(tel_src);
 		size_t if_erased = (*found_maptel).second.erase(src_number);
 
@@ -192,8 +215,12 @@ void maptel_transform(unsigned long id,
 	char *tel_dst,
 	size_t len) {
 
+//cerr << "last_free_id: " << last_free_id() << endl;
+//cerr << "transform id: " << id << endl;
+//cerr << "is_id_taken()[" << id << "] == " << is_id_taken()[id] << endl;
+
 	if (debug) {
-		assert(is_id_taken[id]);
+		assert(is_id_taken()[id]);
 		assert(is_tel_correct(tel_src));
 		// assert(is_tel_correct(tel_dst));
 
@@ -207,8 +234,8 @@ void maptel_transform(unsigned long id,
 	string src_number(tel_src);
 	string dst_number(tel_dst);
 
-	unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = all_maptels.find(id);
-	if(found_maptel == all_maptels.end())
+	unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = all_maptels().find(id);
+	if(found_maptel == all_maptels().end())
 		return;
 
 	maptel_t id_maptel = (*found_maptel).second;
