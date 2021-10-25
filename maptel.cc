@@ -32,15 +32,25 @@ namespace {
 	maptel_id_t last_free_id = 0;
 	
 	bool is_tel_correct(char const *tel) {
+		if (tel == NULL)
+			return false;
+
 		std::regex number("^[0-9]*$");
-		return regex_match(tel, number);
+		if(!regex_match(tel, number))
+			return false;
+
+		size_t last_digit = 0;
+		while(tel[last_digit] != '\0' && last_digit < TEL_NUM_MAX_LEN)
+			last_digit++;
+		
+		return (tel[last_digit] == '\0');
 	}
 }
 
 
 // Tworzy słownik i zwraca jego identyfikator id.
 unsigned long maptel_create(void) {
-	if(debug) {
+	if( debug) {
 		cerr << "maptel: maptel_create()\n";
 	}
 	
@@ -60,24 +70,26 @@ unsigned long maptel_create(void) {
 
 // Usuwa słownik o identyfikatorze id.
 void maptel_delete(unsigned long id) {
-	if(debug) {
+	if (debug) {
+		assert(is_id_taken[id]);
+
 		cerr << "maptel: maptel_delete(" << id << ")\n";
 	}
 	
-	if(is_id_taken[id]) {
-		is_id_taken.erase(id);
-		all_maptels.erase(id);
-		
-		if(debug) {
-			cerr << "maptel: maptel_delete: map " << id << " deleted";
-		}
+
+	is_id_taken.erase(id);
+	all_maptels.erase(id);
+	
+	if (debug) {
+		cerr << "maptel: maptel_delete: map " << id << " deleted";
 	}
-	else {
-		is_id_taken.erase(id);
-		if(debug) {
-			cerr << "maptel: maptel_delete: nothing to delete\n";
-		}
-	}
+	
+	// else {
+	// 	is_id_taken.erase(id);
+	// 	if(debug) {
+	// 		cerr << "maptel: maptel_delete: nothing to delete\n";
+	// 	}
+	// }
 }
 
 // Wstawia do słownika o identyfikatorze id informację
@@ -86,33 +98,34 @@ void maptel_delete(unsigned long id) {
 void maptel_insert(unsigned long id,
 	char const *tel_src,
 	char const *tel_dst) {
-	if(debug) {
+	if (debug) {
+		assert(is_id_taken[id]);
+		assert(is_tel_correct(tel_src));
+		assert(is_tel_correct(tel_dst));
+
 		cerr << "maptel: maptel_insert(" << id << ", " 
 			<< tel_src << ", " << tel_dst << ")\n";
 	}
 	
-	if(!is_id_taken[id]) {
-		is_id_taken.erase(id);
-		
-		if(debug) {
-			cerr << "maptel: map id = " << id << " does not exist\n";
-		}
-		
-		return;
-	}
+
+	// is_id_taken.erase(id);
 	
-	if(!is_tel_correct(tel_src)) {
-		if(debug) {
-			cerr << "maptel: tes_src is not a number\n";
-		}
-		return;
-	}
-	if(!is_tel_correct(tel_dst)) {
-		if(debug) {
-			cerr << "maptel: tes_dst is not a number\n";
-		}
-		return;
-	}
+	// if(debug) {
+	// 	cerr << "maptel: map id = " << id << " does not exist\n";
+	// }
+
+	// if(!is_tel_correct(tel_src)) {
+	// 	if(debug) {
+	// 		cerr << "maptel: tes_src is not a number\n";
+	// 	}
+	// 	return;
+	// }
+	// if(!is_tel_correct(tel_dst)) {
+	// 	if(debug) {
+	// 		cerr << "maptel: tes_dst is not a number\n";
+	// 	}
+	// 	return;
+	// }
 	
 	all_maptels[id][string(tel_src)] = string(tel_dst);
 	
@@ -125,25 +138,24 @@ void maptel_insert(unsigned long id,
 // numeru tel_src, o ile taka istnieje.
 void maptel_erase(unsigned long id, char const *tel_src) {
 	if (debug) {
+		assert(is_id_taken[id]);
+		assert(is_tel_correct(tel_src));
+		
 		cerr << "maptel: maptel_erase(" << id << ", " << tel_src << ")\n";
 	}
 
-	bool nothing_to_erase = false;
 	unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = all_maptels.find(id);
 
 	if (found_maptel != all_maptels.end()) {
 		string src_number(tel_src);
 		size_t if_erased = (*found_maptel).second.erase(src_number);
 
-		if (if_erased == 0)
-			nothing_to_erase = true;
-	}
-	else
-		nothing_to_erase = true;
-
-	if (nothing_to_erase) {
-		if (debug) 
-			cerr << "maptel: maptel_erase: nothing to erase\n";
+		if (debug) {
+			if (if_erased == 0)
+				cerr << "maptel: maptel_erase: nothing to erase\n";
+			else
+				cerr << "maptel: maptel_erase: erased\n";
+		}
 	}
 }
 
@@ -158,6 +170,10 @@ void maptel_transform(unsigned long id,
 	size_t len) {
 
 	if (debug) {
+		assert(is_id_taken[id]);
+		assert(is_tel_correct(tel_src));
+		assert(is_tel_correct(tel_dst));
+
 		cerr << "maptel: maptel_transform(" 
 			<< id << ", "
 			<< tel_src << ", " 
@@ -195,8 +211,9 @@ void maptel_transform(unsigned long id,
 
 	string number_to_copy = write_src_to_dst ? src_number : (*walk1).second;
 
-	// if (len < number_to_copy.length() + 1)
-	// 	realloc(tel_dst, number_to_copy.length() + 1);
+	if (debug) {
+		assert(number_to_copy.size() + 1 <= len);
+	}
 		
 	strcpy(tel_dst, number_to_copy.c_str());
 
