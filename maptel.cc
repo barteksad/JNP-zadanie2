@@ -47,31 +47,29 @@ namespace {
 	unordered_map<maptel_id_t, bool> is_id_taken;
 	maptel_id_t last_free_id;
 
-	static void _all_maptels_init() {
+	void _all_maptels_init() {
 		static unordered_map<maptel_id_t, maptel_t> _all_maptels;
 		all_maptels = _all_maptels;
 	}
 
-	static void _is_id_taken_init() {
+	void _is_id_taken_init() {
 		static unordered_map<maptel_id_t, bool> _is_id_taken;
 		is_id_taken = _is_id_taken;
 	}
 
-	static void _last_free_id_init() {
+	void _last_free_id_init() {
 		static maptel_id_t _last_free_id;
 		last_free_id = _last_free_id;
 	}
 	
 	bool is_tel_correct(char const *tel) {
-		std::cout<<"prfsdafsdfsdjkosdf tu ";
 		if (tel == NULL)
 			return false;
 
 		std::regex number("^[0-9]*$");
-		std::cout<<"przed tu ";
 		if(!regex_match(tel, number))
 			return false;
-		std::cout<<"po ";
+
 		size_t last_digit = 0;
 		while(tel[last_digit] != '\0' && last_digit < TEL_NUM_MAX_LEN)
 			last_digit++;
@@ -212,7 +210,7 @@ void maptel_transform(unsigned long id,
 	if (debug) {
 		assert(is_id_taken[id]);
 		assert(is_tel_correct(tel_src));
-		assert(is_tel_correct(tel_dst));
+		// assert(is_tel_correct(tel_dst));
 
 		cerr << "maptel: maptel_transform(" 
 			<< id << ", "
