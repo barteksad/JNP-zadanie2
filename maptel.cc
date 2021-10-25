@@ -27,22 +27,54 @@ using maptel_t = unordered_map<string, string>;
 using maptel_id_t = unsigned long;
 
 namespace {
+
+	// unordered_map<maptel_id_t, maptel_t> _all_maptels_init() {
+	// 	unordered_map<maptel_id_t, maptel_t> _all_maptels;
+	// 	return _all_maptels;
+	// }
+
+	// unordered_map<maptel_id_t, bool> _is_id_taken_init() {
+	// 	unordered_map<maptel_id_t, bool> _is_id_taken;
+	// 	return _is_id_taken;
+	// }
+
+	// maptel_id_t _last_free_id_init() {
+	// 	maptel_id_t _last_free_id = 0;
+	// 	return _last_free_id;
+	// }
+
 	unordered_map<maptel_id_t, maptel_t> all_maptels;
 	unordered_map<maptel_id_t, bool> is_id_taken;
-	maptel_id_t last_free_id = 0;
+	maptel_id_t last_free_id;
+
+	static void _all_maptels_init() {
+		static unordered_map<maptel_id_t, maptel_t> _all_maptels;
+		all_maptels = _all_maptels;
+	}
+
+	static void _is_id_taken_init() {
+		static unordered_map<maptel_id_t, bool> _is_id_taken;
+		is_id_taken = _is_id_taken;
+	}
+
+	static void _last_free_id_init() {
+		static maptel_id_t _last_free_id;
+		last_free_id = _last_free_id;
+	}
 	
 	bool is_tel_correct(char const *tel) {
+		std::cout<<"prfsdafsdfsdjkosdf tu ";
 		if (tel == NULL)
 			return false;
 
 		std::regex number("^[0-9]*$");
+		std::cout<<"przed tu ";
 		if(!regex_match(tel, number))
 			return false;
-
+		std::cout<<"po ";
 		size_t last_digit = 0;
 		while(tel[last_digit] != '\0' && last_digit < TEL_NUM_MAX_LEN)
 			last_digit++;
-		
 		return (tel[last_digit] == '\0');
 	}
 }
@@ -50,10 +82,15 @@ namespace {
 
 // Tworzy słownik i zwraca jego identyfikator id.
 unsigned long maptel_create(void) {
+
+	_all_maptels_init();
+	_is_id_taken_init();
+	_last_free_id_init();
+	
 	if( debug) {
 		cerr << "maptel: maptel_create()\n";
 	}
-	
+
 	while(is_id_taken[last_free_id]) {
 		++last_free_id;
 	}
@@ -70,6 +107,7 @@ unsigned long maptel_create(void) {
 
 // Usuwa słownik o identyfikatorze id.
 void maptel_delete(unsigned long id) {
+
 	if (debug) {
 		assert(is_id_taken[id]);
 
@@ -98,6 +136,7 @@ void maptel_delete(unsigned long id) {
 void maptel_insert(unsigned long id,
 	char const *tel_src,
 	char const *tel_dst) {
+
 	if (debug) {
 		assert(is_id_taken[id]);
 		assert(is_tel_correct(tel_src));
@@ -137,6 +176,7 @@ void maptel_insert(unsigned long id,
 // Usuwa ze słownika o identyfikatorze id informację o zmianie
 // numeru tel_src, o ile taka istnieje.
 void maptel_erase(unsigned long id, char const *tel_src) {
+
 	if (debug) {
 		assert(is_id_taken[id]);
 		assert(is_tel_correct(tel_src));
