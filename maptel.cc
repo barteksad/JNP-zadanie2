@@ -146,7 +146,7 @@ namespace jnp1 {
 		if (debug) {
 			assert(is_id_taken[id]);
 			assert(is_tel_correct(tel_src));
-			assert(is_tel_correct(tel_dst));
+			//assert(is_tel_correct(tel_dst));
 
 			cerr << "maptel: maptel_transform(" 
 				<< id << ", "
@@ -156,7 +156,7 @@ namespace jnp1 {
 		}
 
 		string src_number(tel_src);
-		//string dst_number(tel_dst);
+		string dst_number(tel_dst);
 
 		unordered_map<maptel_id_t, maptel_t>::iterator found_maptel = 
 			all_maptels.find(id);
@@ -177,6 +177,10 @@ namespace jnp1 {
 				else {
 					if (!seen_numbers.insert((*walk2).second).second) {
 						write_src_to_dst = true;
+
+						if (debug) {
+							cerr << "maptel: maptel_transform: cycle detected\n";
+						}
 						break;
 					}
 					else
